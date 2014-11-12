@@ -203,10 +203,45 @@
             </section>
             <section>
                 <section>
-                    <h2>Generating output with Python</h2>
+                    <h2>Dynamic Websites</h2>
+                    <ul>
+                        <li>With what we learned so far, we can write a <em>static website</em>.</li>
+                        <li>A static website is one which always shows the same results.</li>
+                        <li>It's not so interesting, although we can make some excellent websites with Javascript.</li>
+                        <li>The other method is to have the server generate the pages <em>dynamically</em>.
+                    </ul>
 
                 </section>
 
+                <section>
+                    <h2>Generating webpages with Python</h2>
+                    <pre><code data-language="python">
+from flask import Flask
+
+app = Flask('SoftwareCarpentry')
+
+@app.route('/')
+def index():
+    return """
+&lt;html&gt;
+    &lt;body&gt;
+    &lt;p&gt;Hello World&lt;/&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+"""
+
+app.run()
+                    </code></pre>
+
+                    <div class="fragment">
+                    <pre><code data-language="bash">
+$ python flaskr.py
+                    </code></pre></div>
+                </section>
+
+                <section>
+                    <h2>Generating images from Python!</h2>
+                </section>
                 <section>
                     <h2>Generating images from Python!</h2>
                 </section>
@@ -221,6 +256,21 @@
 
                 <section>
                     <h2>Putting it all together</h2>
+                </section>
+
+                <section>
+                    <h2>This is all on the fly</h2>
+                    <ul>
+                        <li>Whatever you run must be fast enough that the user doesn't get bored.</li>
+                        <li>Matter more if you're google than for a specialized website.</li>
+                        <li>Tricks to make things appear faster
+                            <ul>
+                                <li>Precompute results.</li>
+                                <li>Show partial results.</li>
+                                <li>Say "I'm computing stuff..."</li>
+                            </ul>
+                    </ul>
+
                 </section>
 
                 <section>
