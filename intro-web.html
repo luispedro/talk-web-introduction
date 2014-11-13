@@ -35,7 +35,6 @@
             <section>
                 <section>
                     <h1>Putting your data on the web with webtools</h1>
-                    <p>Partially based on the <a href="https://developer.mozilla.org/en-US/">Mozilla Developer Network</a>
                 </section>
                 <section>
                     <h2>Goals for this session</h2>
@@ -100,10 +99,21 @@
                     </ul>
                 </section>
                 <section>
+                    <h3>Ports</h3>
+                    <p><img src="URL.svg" style="border: 0px" />
+
+                    <ul>
+                        <li>A port is just a number.
+                        <li>HTTP uses port 80 by default.
+                        <li>You can use different ports to keep things separate.
+                    </ul>
+                </section>
+                <section>
                     <h3>Summary</h3>
                     <ul>
-                        <li><tt>http://www.google.com/search?q=Software+Carpentry</tt>
+                        <li><tt>http://www.google.com:80/search?q=Software+Carpentry</tt>
                         <li>Makes an <em>http</em> connection to <em>www.google.com</em>
+                        <li>Says <em>This connection is for port 80</em>
                         <li>Asks for <em>search</em> with argument <em>q</em> having the value <em>Software Carpentry</em>.
                         <li class="fragment">The server returns a response which your browser interprets.</li>
                     </ul>
@@ -137,6 +147,8 @@
                     <h2>Basics of HTML</h2>
                     <ul>
                         <li>&lt;tag&gt; is an opening tag and &lt;/tag&gt; is a closing tag
+                        <li>&lt;tag /&gt; is short for &lt;tag&gt;&lt;/tag&gt;<br />
+                            We'll see an example in a second.
                         <li>Use lower-case (even if it doesn't matter).
                         <li>Hierarchical structure
                         <ul>
@@ -146,6 +158,9 @@
                                         This contains meta information about your document
                                     <li>body<br />
                                         This contains your actual document
+                                    <ul>
+                                        <li>p: paragraph
+                                    </ul>
                                 </ul>
                             </ul>
                     </ul>
@@ -187,9 +202,19 @@
 </pre>
                 </section>
                 <section>
-                    <h2>More
+                    <h2>More HTML</h2>
+                    <ul>
+                        <li>Lists (ul &amp; ol)
+                        <li>Mark text (em, strong, &amp;c)
+                        <li>...
+                    </ul>
                 </section>
                 <section>
+                    <h2>Include images</h2>
+                    <pre><code data-language="html">
+&lt;img src="image.png" /&gt;
+                    </code></pre>
+
                 </section>
 
                 <section>
@@ -240,22 +265,118 @@ $ python flaskr.py
                 </section>
 
                 <section>
-                    <h2>Generating images from Python!</h2>
+                    <h2>Making output depend on the query</h2>
+                    <pre><code data-language="python">
+from flask import Flask, request
+
+app = Flask('SoftwareCarpentry')
+
+@app.route('/')
+def index():
+    name = request.args.get('name', 'World')
+    return """
+&lt;html&gt;
+    &lt;body&gt;
+    &lt;p&gt;Hello {0}&lt;/&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+""".format(name)
+
+app.run()
+                    </code></pre>
+
                 </section>
                 <section>
-                    <h2>Generating images from Python!</h2>
+                    <h2>Using templates</h2>
+                    <p>The previous operation is common, flask supports it builtin</p>
+
+                    <pre><code data-language="html">
+&lt;html&gt;
+    &lt;body&gt;
+    &lt;p&gt;Hello {{ name }}&lt;/p&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+                    </code></pre>
+
+                    <pre><code data-language="python">
+from flask import Flask, render_template, request
+
+app = Flask('SoftwareCarpentry')
+
+@app.route('/')
+def index():
+    name = request.args.get('name', 'World')
+    return render_template('greet.html', name=name)
+
+app.run()
+                    </code></pre>
+
                 </section>
 
                 <section>
-                    <h2>Making things depend on the query</h2>
+                    <h2>Generating images from Python!</h2>
+                    <pre><code data-language="html">
+&lt;html&gt;
+    &lt;body&gt;
+    &lt;p&gt;Value is {{ value }}&lt;/p&gt;
+    &lt;p&gt;&lt;img src="pow-fig?value={{ value }}"&lt;/p&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+                    </code></pre>
+
+                    <pre><code data-language="python">
+from flask import Flask, render_template, request
+import numpy as np
+from matplotlib import pyplot as plt
+
+
+app = Flask('SoftwareCarpentry')
+
+@app.route('/')
+def index():
+    value = float(request.args.get('value', 2.0))
+    return render_template('pow.html', value=value)
+
+
+@app.route('/pow-fig'):
+def pow_fig():
+    value = float(request.args.get('value', 2.0))
+    fig,ax = plt.subplots()
+    ax.plot(np.arange(10)**value)
+    ax.set_xlabel('x')
+    ax.set_ylabel('pow(x,{})'.format(value))
+    fig.savefig('tmp.png')
+    data = open('tmp.png', 'rb')
+    return data.read()
+app.run()
+                    </code></pre>
+                    <p>We could do better code, but this is pretty decent</p>
+                </section>
+                <section>
+                    <h2>Go back and forth!</h2>
+                    <pre><code data-language="html">
+&lt;html&gt;
+    &lt;body&gt;
+    &lt;p&gt;Value is {{ value }}&lt;/p&gt;
+    &lt;p&gt;
+    Go to &lt;a href="/?value={{ value - 1}}"&gt;prev&lt;/a&gt;&lt;br /&gt;
+    Go to &lt;a href="/?value={{ value + 1}}"&gt;next&lt;/a&gt;
+    &lt;p&gt;&lt;img src="pow-fig?value={{ value }}"&lt;/p&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+                    </code></pre>
                 </section>
 
                 <section>
                     <h2>Forms</h2>
-                </section>
-
-                <section>
-                    <h2>Putting it all together</h2>
+                    <pre><code data-language="html">
+&lt;form action="/form" method="get"&gt;
+    &lt;p&gt;Set &lt;input name="value" value="{{ value }}" /&gt;
+    &lt;input type="submit" /&gt;
+&lt;/form&gt;
+                    </code></pre>
                 </section>
 
                 <section>
@@ -281,10 +402,11 @@ $ python flaskr.py
                         <li><strong>Get a separate server</strong>.
                     </ul>
                 </section>
-
+            </section>
             <section>
                 <section>
                     <h1>Thank You</h1>
+                    <p>For more information, the <a href="https://developer.mozilla.org/en-US/">Mozilla Developer Network</a> is an excellent resource.
                 </section>
             </section>
 
